@@ -12,7 +12,11 @@ class Students extends Component {
 	componentDidMount(){
 		fetch('/student')
 			.then(res => res.json())
-			.then(studentsdata => this.setState({students:studentsdata}));
+			.then(res2 => {
+				this.setState({students:res2})
+				console.log(res2);
+			})
+			.catch(e=>console.log(e));
 	}
 	
   render() {
@@ -21,7 +25,10 @@ class Students extends Component {
       	<h2>Students</h2>
       	<ul>
       		{this.state.students.map(student =>
-      			<div id={student.id}> {student.registrationId}. {student.name} {student.class} {student.contactNumber}</div>		//all data not populated yet
+      			<li key={student.id} id={student.id}> 
+				  {student.id}. {student.name} 
+				  {student.class} {student.contactNumber}
+				</li>		//all data not populated yet
       		)}
       	</ul>
       </div>
@@ -30,3 +37,4 @@ class Students extends Component {
 }
 
 export default Students;
+ 

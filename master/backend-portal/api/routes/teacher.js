@@ -49,6 +49,7 @@ router.get('/', function(req, res) {
 	{
 		query += "WHERE name like '%"+teacher.name+"%' ";
 	}
+	query += "ORDER BY id DESC";
 	
 	db.selectDB('UserDB');
 	db.runQuery(""+query+"", function(rows)
@@ -63,7 +64,6 @@ router.get('/', function(req, res) {
 
 ////except get request for all request url will be http://localhost:8086/teacher/1
 router.post('/',upload.single("photo"), function(req, res){
-	console.log(req.file);
 	var registrationId = req.body.registrationId;
 	var name = req.body.name;
 	var address = req.body.address;
@@ -78,7 +78,7 @@ router.post('/',upload.single("photo"), function(req, res){
 	
 	db.selectDB('UserDB');
 	var query = "INSERT INTO TeacherDetails (`registrationId`, `name`,dateOfBirth, `address`,`contactNumber`, `designation`, `qualification`, `specialisedSubject`, `type`, `TeacherDetailscol`) "+
-	             "VALUES('"+registrationId+"', '"+name+"','1996-05-05', '"+address+"', '"+contactNumber+"', '"+designation+"', '"+qualification+"', '"+specialisedSubject+"', '"+type+"', '"+TeacherDetailscol+"')"
+	             "VALUES('"+registrationId+"', '"+name+"','"+dateofBirth+"', '"+address+"', '"+contactNumber+"', '"+designation+"', '"+qualification+"', '"+specialisedSubject+"', '"+type+"', '"+TeacherDetailscol+"')"
 
 	db.runQuery(query, function(rows) {
 		if (rows["state"] == "ok") {

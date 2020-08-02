@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../config/db_config.js');
-
+const Student = require('../modal/student.js');
 const multer  = require('multer');
 const storage = multer.diskStorage({
     destination: function(req, file, callback){
@@ -27,7 +27,7 @@ const fileFilter = (req, file, callback)=>{
 												// then refresh the backend-portal
 
 const upload = multer({                         //comment this for first time, after making folder remove the comment
-    storage: storage, 
+    storage: storage,
     limits:{
         fileSize: 1024 *1024 *4
     },
@@ -37,7 +37,7 @@ const upload = multer({                         //comment this for first time, a
 
 // to get all student url should be "http://localhost:8086/student?name=ani"
 // or "http://localhost:8086/student?id=1"
-router.get('/', function(req, res) {  
+router.get('/', function(req, res) {
 	var student = req.query;
 	var query = "select * from StudentDetails ";
 	if(typeof student.id !== "undefined")
@@ -48,7 +48,7 @@ router.get('/', function(req, res) {
 	{
 		query += "WHERE name like '%"+student.name+"%' ";
 	}
-	
+	query += "ORDER BY id DESC";
 	db.selectDB('UserDB');
 	db.runQuery(""+query+"", function(rows)
 	{
@@ -60,26 +60,47 @@ router.get('/', function(req, res) {
 	});
 });
 
-//except get request for all request url will be http://localhost:8086/student/1 
+//except get request for all request url will be http://localhost:8086/student/1
 router.post('/',upload.single("photo"), function(req, res){
-	var registrationId = req.body.registrationId;
-	var name = req.body.name;
-	var address = req.body.address;
-	var dateofBirth = req.body.dateofBirth;
-	var contactNumber = req.body.contactNumber;
-	var s_class = req.body.s_class;
-	var section = req.body.section;
-	var parentName = req.body.parentName;
-	var photo = req.file.path;
-	var classTeacher = req.body.classTeacher;
+	let S = new Student();
+  var id = S.setId(req.body.studentId);
+	var registrationId = S.setRegistrationId(req.body.registrationId);
+	var name = S.setName(req.body.name);
+	var address = S.setAddress(req.body.address);
+	//var dateofBirth = req.body.dateofBirth;
+	var contactNumber = S.setContactNumber(req.body.contactNumber);
+
+	var s_class = S.setStudentClass(req.body.s_class);
+	var section = S.SetSection(req.body.section);
+	var parentName = S.SetParentName(req.body.parentName);
+  var path = (typeof req.file != 'undefined')?req.file.path:"backend-portal/uploads/cookie.png";
+	var photo = S.SetPhoto(path);
+	var classTeacher = S.SetClassTeacher(req.body.classTeacher);
+
 	db.selectDB('UserDB');
-	var query = "INSERT INTO StudentDetails (`registrationId`, `name`, `address`, `dateofBirth`,`contactNumber`, `class`, `section`, `parentName`, `photo`, `classTeacher`) "+
-	             "VALUES('"+registrationId+"', '"+name+"', '"+address+"','"+dateofBirth+"', '"+contactNumber+"', '"+s_class+"', '"+section+"', '"+parentName+"', '"+photo+"', '"+classTeacher+"')"
-		
+	if(S.getId(id) < 0){
+		var query = "INSERT INTO StudentDetails (`registrationId`, `name`, `address`, `contactNumber`, `class`, `section`, `parentName`, `photo`, `classTeacher`) "+
+	        	     "VALUES('"+S.getRegistrationId()+"', '"+S.getName()+"', '"+S.getAddress()+"', '"+S.getContactNumber()+"', "+
+               		     "'"+S.getStudentClass()+"', '"+S.getSection()+"', '"+S.getParentName()+"', '"+S.getPhoto()+"', '"+S.getClassTeacher()+"')";
+         }
+	 else{
+           var query = "UPDATE StudentDetails SET "+
+                               "`registrationId` = '"+S.getRegistrationId()+"', "+
+                               "`name` = '"+S.getName()+"', "+
+  			       "`address` = '"+S.getAddress()+"', "+
+  			       "`contactNumber` = '"+S.getContactNumber()+"', "+
+  			       "`class` = '"+S.getStudentClass()+"', "+
+  			       "`section` = '"+S.getSection()+"', "+
+  			       "`parentName` = '"+S.getParentName()+"', "+
+  			       "`photo` = '"+S.getPhoto()+"', "+
+  			       "`classTeacher` = '"+S.getClassTeacher()+"' "+
+  			       "WHERE id = '"+S.getId(id)+"';";
+            }
 	db.runQuery(query, function(rows) {
 		if (rows["state"] == "ok") {
-			res.send("Query executed successfully!!");
+			res.send(S);
 		} else {
+      console.log("not query executed");
 			res.send("Not able to create student!!");
 		}
 	});
@@ -109,7 +130,7 @@ router.patch('/:studentId', upload.single("photo"), function(req, res){
 				"`photo` = '"+photo+"', "+
 				"`classTeacher` = '"+classTeacher+"' "+
 				"WHERE id = '"+id+"';";
-	
+
 	db.runQuery(query, function(rows) {
 		if (rows["state"] == "ok") {
 			res.send("Query executed successfully!!");

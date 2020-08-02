@@ -12,11 +12,11 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
-
+<<<<<<< HEAD:backend-portal/uploads/package.json
     "ejs": "^3.0.1",
-
+=======
     "cors": "^2.8.5",
-
+>>>>>>> 4ed899adb0ae651fc3d31e5392514192e0f8e600:backend-portal/package.json
     "express": "^4.16.4",
     "express-flash": "0.0.2",
     "express-session": "^1.17.0",

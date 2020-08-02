@@ -1,39 +1,36 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+
+
 import './App.css';
 import Students from './components/students/students';
+import AddStudent from './components/students/addStudent';
 import Teachers from './components/teachers/teachers';
+import AddTeacher from './components/teachers/addTeacher';
+import Admin from './components/admin';
+import Login from './components/login/login';
+//import Admin from './components/home/admin'
+import {ProtectedRoute} from './components/ProtectedRoute';
 
 class App extends Component {
   constructor() {
     super();
-    this.state = {
-      showstudentComponent: false,
-      showteacherComponent: false,
-    };
-    this.onstudentClick = this.onstudentClick.bind(this);
-    this.onteacherClick = this.onteacherClick.bind(this);
   }
 
-  onstudentClick() {
-    this.setState({
-      showstudentComponent: true,
-    });
-  }
-  onteacherClick(){
-    this.setState({
-    	showteacherComponent: true,
-      });  
-  }
+
   render() {
     return (
       <div className="App">
-        <header>
-        </header>
-        <button onClick={this.onstudentClick}>Students</button>
-        {this.state.showstudentComponent ? <Students /> : null}
-        <button onClick={this.onteacherClick}>Teachers</button>
-        {this.state.showteacherComponent ? <Teachers /> : null}
+        <Switch>
+	      	//<Route exact path="/login" component={Login} />
+        	<Route exact path="/admin" component={Admin} />
+	        <ProtectedRoute exact path="/" component={Admin} />
+	        <ProtectedRoute exact path="/students" component={Students} />
+	        <ProtectedRoute exact path="/teachers" component={Teachers} />
+	        <ProtectedRoute path="/addStudent" component={AddStudent} />
+	        <ProtectedRoute path="/addTeacher" component={Teachers} />
+	</Switch>
       </div>
     );
   }
